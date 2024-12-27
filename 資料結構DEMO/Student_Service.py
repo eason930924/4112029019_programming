@@ -39,7 +39,7 @@ class StudentService:
         student = Student(name, grade)
         self.students[name] = student
         self.tree.insert(student)
-        self.history.push(("add", name))
+        self.history.push(("add", name, grade))
         print(f"已新增學生：{student}")
 
     def update_student(self, name, grade):
@@ -77,22 +77,41 @@ class StudentService:
             print(student)
 
     def undo(self):
-        #復原最近的操作
         if self.history.is_empty():
             print("無操作可復原！")
             return
+
         action = self.history.pop()
+
         if action[0] == "add":
-            self.students.pop(action[1])
-            print(f"已復原新增操作：刪除學生 {action[1]}")
+            # 從學生字典和二元樹中刪除最近新增的學生
+            student = action[1]
+            if action[1] in self.students:
+                del self.students[action[1]]
+                self.tree.delete(action[2])
+                print(f"已復原新增操作：刪除學生 {action[1]}")
+            else:
+                print("復原失敗，找不到該學生資料！")
+
         elif action[0] == "update":
-            self.students[action[1]].grade = action[2]
-            print(f"已復原更新操作：恢復學生 {action[1]} 的成績為 {action[2]}")
+            # 恢復學生的原始成績
+            name, original_grade = action[1], action[2]
+            if name in self.students:
+                updated_student = self.students[name]
+                self.tree.delete(updated_student.grade)
+                updated_student.grade = original_grade
+                self.tree.insert(updated_student)
+                print(f"已復原更新操作：恢復學生 {name} 的成績為 {original_grade}")
+            else:
+                print("復原失敗，找不到該學生資料！")
+
         elif action[0] == "delete":
+            # 將刪除的學生重新加入字典和二元樹
             student = action[1]
             self.students[student.name] = student
             self.tree.insert(student)
             print(f"已復原刪除操作：恢復學生 {student}")
+
 
     def batch_add(self, batch_data):
         #批次新增學生資料
