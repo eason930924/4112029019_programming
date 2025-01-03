@@ -136,17 +136,17 @@ class AVLTree:
         return node
 
     # 刪除節點
-    def _delete(self, node, student):
+    def _delete(self, node, name):
         if not node:
             return node
 
-        # 使用 (成績, 名稱) 進行匹配
-        if (student.grade, student.name) < (node.student.grade, node.student.name):
-            node.left = self._delete(node.left, student)
-        elif (student.grade, student.name) > (node.student.grade, node.student.name):
-            node.right = self._delete(node.right, student)
+        # 使用名稱進行匹配
+        if name < node.student.name:
+            node.left = self._delete(node.left, name)
+        elif name > node.student.name:
+            node.right = self._delete(node.right, name)
         else:
-            # 找到節點，開始刪除邏輯1
+            # 找到要刪除的節點
             if not node.left:
                 return node.right
             if not node.right:
@@ -184,9 +184,8 @@ class AVLTree:
         return node
 
     # 封裝_delete()方便使用
-
-    def delete(self, student):
-        self.root = self._delete(self.root, student)
+    def delete(self, name):
+        self.root = self._delete(self.root, name)
 
     # 尋找指定學生
     def get_student(self, name):
