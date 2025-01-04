@@ -187,18 +187,23 @@ class AVLTree:
     def delete(self, name):
         self.root = self._delete(self.root, name)
 
-    # 尋找指定學生
+     # 封裝_get_student方便使用
     def get_student(self, name):
         return self._get_student(self.root, name)
-
-    # 封裝_get_student()方便使用
+        
+    # 尋找指定學生
     def _get_student(self, node, name):
         if not node:
-            return None  # 未找到目標學生
+            return None  # 如果節點為空，返回 None
 
-        if name == node.student.name:
-            return node.student
-        elif name < node.student.name:
-            return self._get_student(node.left, name)
-        else:
-            return self._get_student(node.right, name)    
+        # 先檢查當前節點
+        if node.student.name == name:
+            return node.student.grade
+
+        # 遞迴查找左子樹
+        left_node = self._get_student(node.left, name)
+        if left_node is not None:
+            return left_node
+
+        # 遞迴查找右子樹
+        return self._get_student(node.right, name)
