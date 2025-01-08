@@ -140,22 +140,21 @@ class AVLTree:
         if not node:
             return node
 
-        # 使用名稱進行匹配
-        if name < node.student.name:
-            node.left = self._delete(node.left, name)
-        elif name > node.student.name:
-            node.right = self._delete(node.right, name)
-        else:
-            # 找到要刪除的節點
+        # 如果當前節點匹配目標名稱
+        if node.student.name == name:
             if not node.left:
                 return node.right
             if not node.right:
                 return node.left
 
-            # 用右子樹的最小值替換節點
+            # 用最小節點替換當前節點
             temp = self.find_min(node.right)
-            node.student = temp.student
-            node.right = self._delete(node.right, temp.student.grade)
+            node.student = temp.student  
+            node.right = self._delete(node.right, temp.student.name)
+            return node
+
+        node.left = self._delete(node.left, name)
+        node.right = self._delete(node.right, name)
 
         # 更新節點高度
         node.height = 1 + max(self.height(node.left), self.height(node.right))
@@ -187,23 +186,21 @@ class AVLTree:
     def delete(self, name):
         self.root = self._delete(self.root, name)
 
-     # 封裝_get_student方便使用
-    def get_student(self, name):
-        return self._get_student(self.root, name)
-        
     # 尋找指定學生
     def _get_student(self, node, name):
         if not node:
-            return None  # 如果節點為空，返回 None
+            return None 
 
-        # 先檢查當前節點
+        # 檢查當前節點
         if node.student.name == name:
             return node.student.grade
 
-        # 遞迴查找左子樹
         left_node = self._get_student(node.left, name)
         if left_node is not None:
             return left_node
 
-        # 遞迴查找右子樹
         return self._get_student(node.right, name)
+
+    # 封裝_get_student()方便使用
+    def get_student(self, name):
+        return self._get_student(self.root, name)
